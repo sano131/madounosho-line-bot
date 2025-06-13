@@ -10,7 +10,7 @@ export async function generateImage(storyText) {
   const basePrompt = `
 An anime-style fantasy illustration. Cinematic, soft glow, rich details.
 
-Story context: "${storyText.slice(0, 600)}"
+Story context: "${storyText?.slice(0, 600) || 'a fantasy story illustration'}"
 `
 
   const response = await openai.images.generate({
