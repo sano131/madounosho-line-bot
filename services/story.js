@@ -35,4 +35,28 @@ const systemPrompt = `
 物語は章ごとに読み手の選択で分岐し、10章で必ず完結します。  
 毎章の終わりに【A: ○○】【B: ○○】の2つの選択肢を提示してください。
 
-描写は映像が思い浮か
+描写は映像が思い浮かぶように情景豊かに、登場人物の心情や台詞を交えて物語性を重視してください。
+`
+
+export async function generateStory(chapter, userChoice) {
+  const messages = [
+    new SystemMessage(systemPrompt),
+    new HumanMessage(
+      `第${chapter}章のストーリーを描いてください。前章の選択は「${userChoice || '最初の出会い'}」です。
+
+- ストーリー本文（500文字程度）
+- キャラクターのセリフを含めてください
+- 最後に必ず、次章への分岐として【A: ○○】【B: ○○】の2つの選択肢を提示してください。`
+    ),
+  ]
+
+  const response = await chat.call(messages)
+  const text = response.content
+
+  const [story, optionAText, optionBText] = text.split(/A: |B: /)
+  return {
+    story: story.trim(),
+    optionA: optionAText?.trim(),
+    optionB: optionBText?.trim(),
+  }
+}
