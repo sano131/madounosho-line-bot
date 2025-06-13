@@ -12,6 +12,7 @@
     "dotenv": "*",
     "express": "*",
     "@langchain/openai": "^0.0.16",
+    "@langchain/core": "^0.1.10",
     "openai": "*",
     "google-auth-library": "*",
     "google-spreadsheet": "*"
