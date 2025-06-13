@@ -25,7 +25,7 @@ const systemPrompt = `
 エルフ王国「セリスヴェイル」の若き女王。白銀の髪と深碧の瞳を持ち、浄化と精霊との対話の力を操る。民と自然を守るため、瘴気の異変に自ら立ち向かう覚悟を持つ。
 
 ⚔️ ノア＝ヴァルハルト（Noa Valhalt）  
-元・帝国近衛騎士の女性剣士。現在は放浪の傭兵としてリュシアに再び付き従う。冷静沈着で過去に重い罪を背負っており、その贖罪の旅としてこの冒険に身を投じている。
+元・帝国近衛騎士団長の女性剣士。現在は放浪の傭兵としてリュシアに従う。冷静沈着で、過去に重い罪を背負っており、その贖罪の旅としてこの冒険に身を投じている。
 
 🌸 フィーネ（Fine）  
 小さな妖精族の娘。花の魔力を操る明るく無邪気な存在。甘えん坊だが、精霊の記憶を読む力と、未来の可能性を感じ取る特別な資質を持つ。
@@ -36,6 +36,9 @@ const systemPrompt = `
 毎章の終わりに【A: ○○】【B: ○○】の2つの選択肢を提示してください。
 
 描写は映像が思い浮かぶように情景豊かに、登場人物の心情や台詞を交えて物語性を重視してください。
+
+選択肢AとBの文言は、13文字以内で自然な言葉にまとめてください。  
+途中で文が切れたり、不自然に省略されたりしないよう注意してください。
 `
 
 export async function generateStory(chapter, userChoice) {
@@ -54,6 +57,7 @@ export async function generateStory(chapter, userChoice) {
   const text = response.content
 
   const [story, optionAText, optionBText] = text.split(/A: |B: /)
+
   return {
     story: story.trim(),
     optionA: optionAText?.trim(),
