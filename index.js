@@ -39,6 +39,7 @@ async function handleEvent(event) {
   }
 
   const isFinalChapter = userData.chapter >= 10
+
   const { story, optionA, optionB } = await generateStory(userData.chapter, userChoice)
   const imageUrl = await generateImage(story)
 
