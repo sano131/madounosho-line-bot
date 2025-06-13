@@ -14,9 +14,12 @@ const auth = new JWT({
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 })
 
-// ユーザーシート初期化
+// ✅ ここが修正ポイント
 async function loadSheet() {
-  await doc.useJwtAuth(auth)
+  await doc.useServiceAccountAuth({
+    client_email: serviceAccount.client_email,
+    private_key: serviceAccount.private_key,
+  })
   await doc.loadInfo()
   const sheet = doc.sheetsByTitle['users'] || await doc.addSheet({
     title: 'users',
@@ -25,12 +28,10 @@ async function loadSheet() {
   return sheet
 }
 
-// ユーザーデータを取得
 export async function getUserData(userId) {
   const sheet = await loadSheet()
   const rows = await sheet.getRows()
   const row = rows.find((r) => r.userId === userId)
-
   if (!row) return null
   return {
     chapter: parseInt(row.chapter),
@@ -38,7 +39,6 @@ export async function getUserData(userId) {
   }
 }
 
-// ユーザーデータを保存
 export async function saveUserData(userId, data) {
   const sheet = await loadSheet()
   const rows = await sheet.getRows()
