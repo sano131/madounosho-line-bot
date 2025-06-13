@@ -15,6 +15,6 @@
     "@langchain/core": "^0.1.10",
     "openai": "*",
     "google-auth-library": "*",
-    "google-spreadsheet": "*"
+    "google-spreadsheet": "^3.3.0"
   }
 }
