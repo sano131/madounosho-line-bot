@@ -41,13 +41,21 @@ async function handleEvent(event) {
   const isFinalChapter = userData.chapter >= 10
 
   const { story, optionA, optionB } = await generateStory(userData.chapter, userChoice)
+
+  // 👇 画像生成に失敗した場合でも fallback できるよう try-catch で囲ってもOK
   const imageUrl = await generateImage(story)
 
   userData.history.push({ chapter: userData.chapter, choice: userChoice, story })
 
   await saveUserData(userId, userData)
 
-  const message = createFlexMessage(story, imageUrl, isFinalChapter ? null : optionA, isFinalChapter ? null : optionB)
+  const message = createFlexMessage(
+    story,
+    imageUrl,
+    isFinalChapter ? null : optionA,
+    isFinalChapter ? null : optionB
+  )
+
   return client.replyMessage(event.replyToken, message)
 }
 
