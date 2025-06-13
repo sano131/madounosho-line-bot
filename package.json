@@ -11,7 +11,7 @@
     "@line/bot-sdk": "*",
     "dotenv": "*",
     "express": "*",
-    "langchain": "*",
+    "@langchain/openai": "^0.0.16",
     "openai": "*",
     "google-auth-library": "*",
     "google-spreadsheet": "*"
