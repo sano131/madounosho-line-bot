@@ -8,23 +8,22 @@ const serviceAccount = JSON.parse(
 )
 
 const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID)
-const auth = new JWT({
-  email: serviceAccount.client_email,
-  key: serviceAccount.private_key,
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-})
 
-// ✅ ここが修正ポイント
 async function loadSheet() {
   await doc.useServiceAccountAuth({
     client_email: serviceAccount.client_email,
     private_key: serviceAccount.private_key,
   })
   await doc.loadInfo()
-  const sheet = doc.sheetsByTitle['users'] || await doc.addSheet({
-    title: 'users',
-    headerValues: ['userId', 'chapter', 'history']
-  })
+
+  let sheet = doc.sheetsByTitle['users']
+  if (!sheet) {
+    sheet = await doc.addSheet({
+      title: 'users',
+      headerValues: ['userId', 'chapter', 'history', 'lastUpdated'],
+    })
+  }
+
   return sheet
 }
 
@@ -47,12 +46,16 @@ export async function saveUserData(userId, data) {
   if (row) {
     row.chapter = data.chapter
     row.history = JSON.stringify(data.history)
+    row.lastUpdated = new Date().toISOString()
     await row.save()
+    console.log('[✅] Updated row for:', userId)
   } else {
     await sheet.addRow({
       userId,
       chapter: data.chapter,
       history: JSON.stringify(data.history),
+      lastUpdated: new Date().toISOString(),
     })
+    console.log('[✅] Added new row for:', userId)
   }
 }
