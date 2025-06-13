@@ -6,9 +6,9 @@ export function createFlexMessage(story, imageUrl, optionA, optionB) {
       type: 'button',
       action: {
         type: 'postback',
-        label: optionA,
+        label: optionA.slice(0, 13),
         data: optionA,
-        displayText: optionA,
+        displayText: optionA.slice(0, 13),
       },
       style: 'primary',
     })
@@ -17,9 +17,9 @@ export function createFlexMessage(story, imageUrl, optionA, optionB) {
       type: 'button',
       action: {
         type: 'postback',
-        label: optionB,
+        label: optionB.slice(0, 13),
         data: optionB,
-        displayText: optionB,
+        displayText: optionB.slice(0, 13),
       },
       style: 'primary',
     })
@@ -27,7 +27,7 @@ export function createFlexMessage(story, imageUrl, optionA, optionB) {
 
   return {
     type: 'flex',
-    altText: '異世界ノ書：新しい章が始まります',
+    altText: '異世界ノ書：新しい章が届きました📘',
     contents: {
       type: 'bubble',
       size: 'mega',
