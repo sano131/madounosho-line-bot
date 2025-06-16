@@ -11,6 +11,8 @@ export function createFlexMessage(story, imageUrl, optionA, optionB) {
         displayText: optionA.slice(0, 13),
       },
       style: 'primary',
+      height: 'sm',
+      margin: 'sm',
     })
 
     buttons.push({
@@ -22,6 +24,8 @@ export function createFlexMessage(story, imageUrl, optionA, optionB) {
         displayText: optionB.slice(0, 13),
       },
       style: 'primary',
+      height: 'sm',
+      margin: 'sm',
     })
   }
 
