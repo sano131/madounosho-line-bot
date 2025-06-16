@@ -32,13 +32,14 @@ const systemPrompt = `
 
 ---
 
-物語は章ごとに読み手の選択で分岐し、10章で必ず完結します。  
-毎章の終わりに【A: ○○】【B: ○○】の2つの選択肢を提示してください。
+物語は章ごとに読み手の選択で分岐し、10章で必ず完結します。
 
-描写は映像が思い浮かぶように情景豊かに、登場人物の心情や台詞を交えて物語性を重視してください。
+毎章の終わりに、2つの選択肢を提示してください。  
+それぞれの選択肢は13文字以内の自然な日本語文でお願いします。  
+記号（例：【】、A: B:など）は使わず、選択肢のみを文として出力してください。
 
-選択肢AとBの文言は、13文字以内で自然な言葉にまとめてください。  
-途中で文が切れたり、不自然に省略されたりしないよう注意してください。
+また、登場人物が物語に初めて登場する場合には、  
+読者が自然に理解できるように簡単な人物紹介を物語の流れの中に含めてください。
 `
 
 export async function generateStory(chapter, userChoice) {
@@ -49,23 +50,30 @@ export async function generateStory(chapter, userChoice) {
 
 - ストーリー本文（500文字程度）
 - キャラクターのセリフを含めてください
-- 登場人物が物語に初めて登場する時は、読者が理解できるように簡単な人物紹介を加えてください。  
-すでに読者が知っているキャラとして描くのではなく、誰なのかを説明してください。  
-ただし物語の自然な流れを崩さないよう、セリフや状況の中でさりげなく伝えてください。
-- 毎章の終わりに、2つの選択肢を提示してください。  
-それぞれの選択肢は13文字以内で自然な日本語にしてください。  
-記号（例：【】やA: など）は使わず、ただの文章として出力してください。`
+- 最後に必ず、2つの選択肢のみを提示してください（例：「森を進む」「城へ戻る」など）`
     ),
   ]
 
   const response = await chat.call(messages)
   const text = response.content
 
-  const [story, optionAText, optionBText] = text.split(/A: |B: /)
+  const [story, optionAText, optionBText] = text.split(/\n/).reduce(
+    (acc, line) => {
+      if (!acc[0] && line.trim()) {
+        acc[0] = line.trim()
+      } else if (!acc[1] && line.trim()) {
+        acc[1] = line.trim()
+      } else if (!acc[2] && line.trim()) {
+        acc[2] = line.trim()
+      }
+      return acc
+    },
+    [null, null, null]
+  )
 
   return {
-    story: story.trim(),
-    optionA: optionAText?.trim(),
-    optionB: optionBText?.trim(),
+    story: story || '',
+    optionA: optionAText || '',
+    optionB: optionBText || '',
   }
 }
