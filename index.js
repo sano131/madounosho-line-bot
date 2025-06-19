@@ -16,13 +16,20 @@ const config = {
 const client = new Client(config)
 const app = express()
 
+// ✅ Webhookのbodyパースを有効にする（超重要！）
+app.use(express.json())
+
+// ✅ Webhookエンドポイント
 app.post('/webhook', middleware(config), async (req, res) => {
   const events = req.body.events
   const results = await Promise.all(events.map(handleEvent))
   res.json(results)
 })
 
+// ✅ イベントハンドラー
 async function handleEvent(event) {
+  console.log('🔥 Event received:', JSON.stringify(event, null, 2)) // 任意のデバッグログ
+
   if (event.type !== 'message' && event.type !== 'postback') return null
 
   const userId = event.source.userId
@@ -42,7 +49,6 @@ async function handleEvent(event) {
 
   const { story, optionA, optionB } = await generateStory(userData.chapter, userChoice)
 
-  // 👇 画像生成に失敗した場合でも fallback できるよう try-catch で囲ってもOK
   const imageUrl = await generateImage(story)
 
   userData.history.push({ chapter: userData.chapter, choice: userChoice, story })
@@ -59,6 +65,7 @@ async function handleEvent(event) {
   return client.replyMessage(event.replyToken, message)
 }
 
+// ✅ ポート起動
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`魔導ノ書 Bot is running on port ${PORT}`)
