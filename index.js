@@ -16,7 +16,7 @@ const config = {
 const client = new Client(config)
 const app = express()
 
-// ✅ Webhookのbodyパースを有効にする（超重要！）
+// ✅ Webhookのbodyパースを有効にする
 app.use(express.json())
 
 // ✅ Webhookエンドポイント
@@ -28,7 +28,7 @@ app.post('/webhook', middleware(config), async (req, res) => {
 
 // ✅ イベントハンドラー
 async function handleEvent(event) {
-  console.log('🔥 Event received:', JSON.stringify(event, null, 2)) // 任意のデバッグログ
+  console.log('🔥 Event received:', JSON.stringify(event, null, 2))
 
   if (event.type !== 'message' && event.type !== 'postback') return null
 
@@ -45,28 +45,44 @@ async function handleEvent(event) {
     userData.chapter += 1
   }
 
+  // ✅ メッセージテキストがあるか確認
+  if (event.type === 'message') {
+    const text = event.message.text || ''
+    if (!text || !text.trim()) {
+      console.log('⚠️ 空メッセージ、スキップ')
+      return null
+    }
+  }
+
   const isFinalChapter = userData.chapter >= 10
 
-  const { story, optionA, optionB } = await generateStory(userData.chapter, userChoice)
+  try {
+    const { story, optionA, optionB } = await generateStory(userData.chapter, userChoice)
+    const imageUrl = await generateImage(story)
 
-  const imageUrl = await generateImage(story)
+    userData.history.push({ chapter: userData.chapter, choice: userChoice, story })
+    await saveUserData(userId, userData)
 
-  userData.history.push({ chapter: userData.chapter, choice: userChoice, story })
+    const message = createFlexMessage(
+      story,
+      imageUrl,
+      isFinalChapter ? null : optionA,
+      isFinalChapter ? null : optionB
+    )
 
-  await saveUserData(userId, userData)
-
-  const message = createFlexMessage(
-    story,
-    imageUrl,
-    isFinalChapter ? null : optionA,
-    isFinalChapter ? null : optionB
-  )
-
-  return client.replyMessage(event.replyToken, message)
+    await client.replyMessage(event.replyToken, message)
+    console.log('✅ メッセージ送信成功')
+  } catch (error) {
+    console.error('❌ エラー発生:', error)
+    await client.replyMessage(event.replyToken, {
+      type: 'text',
+      text: 'すみません、現在お返事できません。少ししてからもう一度お試しください！',
+    })
+  }
 }
 
 // ✅ ポート起動
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
-  console.log(`魔導ノ書 Bot is running on port ${PORT}`)
+  console.log(`⚔️ 魔導ノ書 Bot is running on port ${PORT}`)
 })
